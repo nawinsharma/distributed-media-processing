@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobStatus {
+  CREATED
+  QUEUED
+  PROCESSING
+  RETRYING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model VideoJob {
+  id           String    @id @default(uuid())
+  userId       String?
+  requestId    String    @unique
+  inputKey     String
+  outputKeys   Json?
+  status       JobStatus @default(CREATED)
+  progress     Int       @default(0)
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+  payloadVersion Int     @default(1)
+  priority     Int       @default(0)
+  duration     Float?
+  resolution   String?
+  codec        String?
+  fileSize     Int?
+  mimeType     String?
+  errorMessage String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("video_jobs")
+}
